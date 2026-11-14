@@ -1,0 +1,171 @@
+{
+  "receita": {
+    "epocas": 30,
+    "lam": 0.0,
+    "lote": 1024,
+    "lr": 0.02,
+    "semente": 0
+  },
+  "referencia_gemma2": {
+    "grupo_hit@1": 0.5315284441398218,
+    "grupo_hit@3": 0.6991089787525703,
+    "grupo_hit@5": 0.7601096641535298,
+    "subclasse_hit@1": 0.7008224811514736,
+    "subclasse_hit@3": 0.863262508567512
+  },
+  "vetores": {
+    "qwen3_8b_tac": {
+      "meta": {
+        "status": "completo",
+        "csv_sha256": "4c5074700129415edb86f4a999d7305e68a70e59c89258bd986a43c2f0922f62",
+        "rows": 20697,
+        "model": "Qwen/Qwen3-Embedding-8B",
+        "model_revision": null,
+        "version": "TAC",
+        "text_template": "patente_titulo_resumo_reivindicacoes_v1",
+        "max_tokens": 4096,
+        "block_size": 128,
+        "dimension": 4096,
+        "dtype": "float16",
+        "normalized": true,
+        "blocks": 162,
+        "completed_rows": 20697,
+        "truncated_rows": 2282,
+        "transformers_version": "5.20.1",
+        "exported_at_utc": "2026-10-17T15:06:08.584253+00:00",
+        "vectors_sha256": "743c2982a228892eebc2688058fbe8ee0ca5d5b7855c5c43a4d8a4265c4bdfd6",
+        "ids_sha256": "77633977d1f96d657b9e7c022d556b9181ecd638bd8c6e2eb64c6efaabff4463"
+      },
+      "dimensao": 4096,
+      "validation": {
+        "grupo_hit@1": 0.5478142076502732,
+        "grupo_hit@3": 0.7182377049180327,
+        "grupo_hit@5": 0.7769808743169399,
+        "subclasse_hit@1": 0.7100409836065574,
+        "subclasse_hit@3": 0.8661202185792349,
+        "recall@5_raros": 0.3467635402906209,
+        "recall@5_frequentes": 0.654149377593361,
+        "n": 2928
+      },
+      "test": {
+        "grupo_hit@1": 0.5322138450993832,
+        "grupo_hit@3": 0.701507882111035,
+        "grupo_hit@5": 0.7587388622344071,
+        "subclasse_hit@1": 0.6874571624400274,
+        "subclasse_hit@3": 0.8495544893762851,
+        "recall@5_raros": 0.3309723116548616,
+        "recall@5_frequentes": 0.6390742285237698,
+        "n": 2918
+      },
+      "teste_truncados": {
+        "grupo_hit@1": 0.3575757575757576,
+        "grupo_hit@3": 0.503030303030303,
+        "grupo_hit@5": 0.5393939393939394,
+        "subclasse_hit@1": 0.47878787878787876,
+        "subclasse_hit@3": 0.6454545454545455,
+        "recall@5_raros": 0.04032258064516129,
+        "recall@5_frequentes": 0.3388042203985932,
+        "n": 330
+      },
+      "teste_nao_truncados": {
+        "grupo_hit@1": 0.5544822256568779,
+        "grupo_hit@3": 0.7268160741885626,
+        "grupo_hit@5": 0.7867078825347759,
+        "subclasse_hit@1": 0.714064914992272,
+        "subclasse_hit@3": 0.875579598145286,
+        "recall@5_raros": 0.3561931420573828,
+        "recall@5_frequentes": 0.7040324625919351,
+        "n": 2588
+      },
+      "comparacao_gemma2_teste": {
+        "grupo@1": {
+          "dif": 0.0007,
+          "ic95": [
+            -0.0147,
+            0.0164
+          ],
+          "melhora": 274,
+          "piora": 272
+        },
+        "grupo@3": {
+          "dif": 0.0024,
+          "ic95": [
+            -0.0113,
+            0.0164
+          ],
+          "melhora": 222,
+          "piora": 215
+        },
+        "subclasse@1": {
+          "dif": -0.0134,
+          "ic95": [
+            -0.0271,
+            0.001
+          ],
+          "melhora": 217,
+          "piora": 256
+        },
+        "subclasse@3": {
+          "dif": -0.0137,
+          "ic95": [
+            -0.0254,
+            -0.0017
+          ],
+          "melhora": 127,
+          "piora": 167
+        }
+      }
+    }
+  },
+  "analise_complementar_teste": {
+    "nota": "Mesmo teste; roteado = Qwen 8B quando o texto TAC tem até 4.096 tokens (não truncado na geração), Gemma 2 TAC caso contrário (regra fixa, não ajustada no teste); fusão = soma das notas hierárquicas dos dois modelos",
+    "gemma2_tac": {
+      "grupo_hit@1": 0.532,
+      "grupo_hit@3": 0.699,
+      "subclasse_hit@1": 0.701,
+      "subclasse_hit@3": 0.863,
+      "recall@5_raros": 0.299
+    },
+    "qwen8b_tac": {
+      "grupo_hit@1": 0.532,
+      "grupo_hit@3": 0.702,
+      "subclasse_hit@1": 0.687,
+      "subclasse_hit@3": 0.85,
+      "recall@5_raros": 0.331
+    },
+    "fusao_soma": {
+      "grupo_hit@1": 0.556,
+      "grupo_hit@3": 0.725,
+      "subclasse_hit@1": 0.716,
+      "subclasse_hit@3": 0.874,
+      "recall@5_raros": 0.328
+    },
+    "roteado_por_tokens": {
+      "grupo_hit@1": 0.57,
+      "grupo_hit@3": 0.738,
+      "subclasse_hit@1": 0.724,
+      "subclasse_hit@3": 0.883,
+      "recall@5_raros": 0.356
+    },
+    "por_truncamento_grupo_hit@1": {
+      "nao_truncados_2588": {
+        "gemma2": 0.512,
+        "qwen8b": 0.554
+      },
+      "truncados_330": {
+        "gemma2": 0.688,
+        "qwen8b": 0.358
+      }
+    },
+    "por_truncamento_subclasse_hit@1": {
+      "nao_truncados_2588": {
+        "gemma2": 0.687,
+        "qwen8b": 0.714
+      },
+      "truncados_330": {
+        "gemma2": 0.806,
+        "qwen8b": 0.479
+      }
+    }
+  }
+}

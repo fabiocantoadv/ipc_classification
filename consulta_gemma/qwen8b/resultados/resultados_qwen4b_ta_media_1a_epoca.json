@@ -1,0 +1,243 @@
+{
+  "receita": {
+    "epocas": 30,
+    "lam": 0.0,
+    "lote": 1024,
+    "lr": 0.02,
+    "semente": 0
+  },
+  "referencia_gemma2": {
+    "grupo_hit@1": 0.5315284441398218,
+    "grupo_hit@3": 0.6991089787525703,
+    "grupo_hit@5": 0.7601096641535298,
+    "subclasse_hit@1": 0.7008224811514736,
+    "subclasse_hit@3": 0.863262508567512
+  },
+  "vetores": {
+    "q4_TA": {
+      "meta": {
+        "status": "completo",
+        "csv_sha256": "4c5074700129415edb86f4a999d7305e68a70e59c89258bd986a43c2f0922f62",
+        "rows": 20697,
+        "model": "Qwen/Qwen3-Embedding-4B",
+        "model_revision": null,
+        "version": "TA",
+        "text_template": "patente_titulo_resumo_reivindicacoes_v1",
+        "max_tokens": 4096,
+        "block_size": 128,
+        "dimension": 2560,
+        "dtype": "float16",
+        "normalized": true,
+        "transformers_version": "5.20.1",
+        "blocks": 162,
+        "completed_rows": 20697,
+        "truncated_rows": 0
+      },
+      "dimensao": 2560,
+      "validation": {
+        "grupo_hit@1": 0.5566939890710383,
+        "grupo_hit@3": 0.7260928961748634,
+        "grupo_hit@5": 0.7872267759562842,
+        "subclasse_hit@1": 0.7192622950819673,
+        "subclasse_hit@3": 0.880464480874317,
+        "recall@5_raros": 0.34610303830911493,
+        "recall@5_frequentes": 0.6721991701244814,
+        "n": 2928
+      },
+      "test": {
+        "grupo_hit@1": 0.5421521590130226,
+        "grupo_hit@3": 0.725496915695682,
+        "grupo_hit@5": 0.7748457847840987,
+        "subclasse_hit@1": 0.7063056888279644,
+        "subclasse_hit@3": 0.8714873200822482,
+        "recall@5_raros": 0.33676754668383774,
+        "recall@5_frequentes": 0.6682652210175146,
+        "n": 2918
+      },
+      "teste_longos": {
+        "grupo_hit@1": 0.6393939393939394,
+        "grupo_hit@3": 0.8393939393939394,
+        "grupo_hit@5": 0.8939393939393939,
+        "subclasse_hit@1": 0.7696969696969697,
+        "subclasse_hit@3": 0.9424242424242424,
+        "recall@5_raros": 0.3951612903225806,
+        "recall@5_frequentes": 0.6143024618991794,
+        "n": 330
+      },
+      "teste_curtos": {
+        "grupo_hit@1": 0.5297527047913446,
+        "grupo_hit@3": 0.7109737248840804,
+        "grupo_hit@5": 0.759659969088099,
+        "subclasse_hit@1": 0.6982225656877898,
+        "subclasse_hit@3": 0.8624420401854714,
+        "recall@5_raros": 0.33170048985304407,
+        "recall@5_frequentes": 0.6799391326401217,
+        "n": 2588
+      },
+      "comparacao_gemma2_teste": {
+        "grupo@1": {
+          "dif": 0.0106,
+          "ic95": [
+            -0.0038,
+            0.0247
+          ],
+          "melhora": 248,
+          "piora": 217
+        },
+        "grupo@3": {
+          "dif": 0.0264,
+          "ic95": [
+            0.0134,
+            0.0391
+          ],
+          "melhora": 226,
+          "piora": 149
+        },
+        "subclasse@1": {
+          "dif": 0.0055,
+          "ic95": [
+            -0.0075,
+            0.0189
+          ],
+          "melhora": 196,
+          "piora": 180
+        },
+        "subclasse@3": {
+          "dif": 0.0082,
+          "ic95": [
+            -0.0017,
+            0.0175
+          ],
+          "melhora": 115,
+          "piora": 91
+        }
+      }
+    },
+    "q4_media_TA_C": {
+      "meta": {
+        "composicao": "media",
+        "partes": [
+          {
+            "status": "completo",
+            "csv_sha256": "4c5074700129415edb86f4a999d7305e68a70e59c89258bd986a43c2f0922f62",
+            "rows": 20697,
+            "model": "Qwen/Qwen3-Embedding-4B",
+            "model_revision": null,
+            "version": "TA",
+            "text_template": "patente_titulo_resumo_reivindicacoes_v1",
+            "max_tokens": 4096,
+            "block_size": 128,
+            "dimension": 2560,
+            "dtype": "float16",
+            "normalized": true,
+            "transformers_version": "5.20.1",
+            "blocks": 162,
+            "completed_rows": 20697,
+            "truncated_rows": 0
+          },
+          {
+            "status": "completo",
+            "csv_sha256": "20015d751e1a48382a9ec093ce013cc619c10b7c250bb6c21561f180f07ceeb8",
+            "rows": 20697,
+            "model": "Qwen/Qwen3-Embedding-4B",
+            "model_revision": null,
+            "version": "C",
+            "text_template": "patente_titulo_resumo_reivindicacoes_v1",
+            "max_tokens": 8192,
+            "sufixo_especial_preservado": [
+              151643
+            ],
+            "block_size": 128,
+            "dimension": 2560,
+            "dtype": "float16",
+            "normalized": true,
+            "transformers_version": "5.23.0",
+            "blocks": 162,
+            "completed_rows": 20697,
+            "truncated_rows": 495
+          }
+        ],
+        "model": "Qwen/Qwen3-Embedding-4B"
+      },
+      "dimensao": 2560,
+      "validation": {
+        "grupo_hit@1": 0.58025956284153,
+        "grupo_hit@3": 0.7503415300546448,
+        "grupo_hit@5": 0.8043032786885246,
+        "subclasse_hit@1": 0.7342896174863388,
+        "subclasse_hit@3": 0.8886612021857924,
+        "recall@5_raros": 0.36261558784676357,
+        "recall@5_frequentes": 0.6937759336099585,
+        "n": 2928
+      },
+      "test": {
+        "grupo_hit@1": 0.5582590815627142,
+        "grupo_hit@3": 0.7306374228923921,
+        "grupo_hit@5": 0.7912954078135709,
+        "subclasse_hit@1": 0.7183002056202878,
+        "subclasse_hit@3": 0.8752570253598355,
+        "recall@5_raros": 0.360592401802962,
+        "recall@5_frequentes": 0.6839032527105922,
+        "n": 2918
+      },
+      "teste_longos": {
+        "grupo_hit@1": 0.6666666666666666,
+        "grupo_hit@3": 0.8606060606060606,
+        "grupo_hit@5": 0.9,
+        "subclasse_hit@1": 0.793939393939394,
+        "subclasse_hit@3": 0.9424242424242424,
+        "recall@5_raros": 0.3790322580645161,
+        "recall@5_frequentes": 0.6307151230949589,
+        "n": 330
+      },
+      "teste_curtos": {
+        "grupo_hit@1": 0.544435857805255,
+        "grupo_hit@3": 0.714064914992272,
+        "grupo_hit@5": 0.7774343122102009,
+        "subclasse_hit@1": 0.7086553323029366,
+        "subclasse_hit@3": 0.866692426584235,
+        "recall@5_raros": 0.35899230230930723,
+        "recall@5_frequentes": 0.6954095866091808,
+        "n": 2588
+      },
+      "comparacao_gemma2_teste": {
+        "grupo@1": {
+          "dif": 0.0267,
+          "ic95": [
+            0.012,
+            0.0404
+          ],
+          "melhora": 247,
+          "piora": 169
+        },
+        "grupo@3": {
+          "dif": 0.0315,
+          "ic95": [
+            0.0202,
+            0.0428
+          ],
+          "melhora": 202,
+          "piora": 110
+        },
+        "subclasse@1": {
+          "dif": 0.0175,
+          "ic95": [
+            0.0048,
+            0.0298
+          ],
+          "melhora": 194,
+          "piora": 143
+        },
+        "subclasse@3": {
+          "dif": 0.012,
+          "ic95": [
+            0.0027,
+            0.0206
+          ],
+          "melhora": 109,
+          "piora": 74
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+# dados de texto e vetores (ficam fora do repositório; ver README, seção 12)
+*.csv
+*.npy
+Embeddings/
+saida*/
+*.joblib
+# ambiente
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store

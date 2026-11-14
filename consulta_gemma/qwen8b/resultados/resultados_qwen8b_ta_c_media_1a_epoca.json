@@ -1,0 +1,345 @@
+{
+  "receita": {
+    "epocas": 30,
+    "lam": 0.0,
+    "lote": 1024,
+    "lr": 0.02,
+    "semente": 0
+  },
+  "referencia_gemma2": {
+    "grupo_hit@1": 0.5315284441398218,
+    "grupo_hit@3": 0.6991089787525703,
+    "grupo_hit@5": 0.7601096641535298,
+    "subclasse_hit@1": 0.7008224811514736,
+    "subclasse_hit@3": 0.863262508567512
+  },
+  "vetores": {
+    "q8_TA": {
+      "meta": {
+        "status": "completo",
+        "csv_sha256": "4c5074700129415edb86f4a999d7305e68a70e59c89258bd986a43c2f0922f62",
+        "rows": 20697,
+        "model": "Qwen/Qwen3-Embedding-8B",
+        "model_revision": null,
+        "version": "TA",
+        "text_template": "patente_titulo_resumo_reivindicacoes_v1",
+        "max_tokens": 4096,
+        "block_size": 128,
+        "dimension": 4096,
+        "dtype": "float16",
+        "normalized": true,
+        "transformers_version": "5.20.1",
+        "blocks": 162,
+        "completed_rows": 20697,
+        "truncated_rows": 0
+      },
+      "dimensao": 4096,
+      "validation": {
+        "grupo_hit@1": 0.5607923497267759,
+        "grupo_hit@3": 0.730191256830601,
+        "grupo_hit@5": 0.7889344262295082,
+        "subclasse_hit@1": 0.7168715846994536,
+        "subclasse_hit@3": 0.8801229508196722,
+        "recall@5_raros": 0.3520475561426684,
+        "recall@5_frequentes": 0.6751037344398341,
+        "n": 2928
+      },
+      "test": {
+        "grupo_hit@1": 0.5562028786840302,
+        "grupo_hit@3": 0.7248115147361206,
+        "grupo_hit@5": 0.7854694996572995,
+        "subclasse_hit@1": 0.7169294037011652,
+        "subclasse_hit@3": 0.8728581220013708,
+        "recall@5_raros": 0.3412749517063748,
+        "recall@5_frequentes": 0.6699332777314428,
+        "n": 2918
+      },
+      "teste_longos": {
+        "grupo_hit@1": 0.693939393939394,
+        "grupo_hit@3": 0.8757575757575757,
+        "grupo_hit@5": 0.9030303030303031,
+        "subclasse_hit@1": 0.806060606060606,
+        "subclasse_hit@3": 0.9393939393939394,
+        "recall@5_raros": 0.3790322580645161,
+        "recall@5_frequentes": 0.6154747948417351,
+        "n": 330
+      },
+      "teste_curtos": {
+        "grupo_hit@1": 0.5386398763523956,
+        "grupo_hit@3": 0.705564142194745,
+        "grupo_hit@5": 0.7704791344667697,
+        "subclasse_hit@1": 0.705564142194745,
+        "subclasse_hit@3": 0.8643740340030912,
+        "recall@5_raros": 0.33799860041987406,
+        "recall@5_frequentes": 0.6817144306365711,
+        "n": 2588
+      },
+      "comparacao_gemma2_teste": {
+        "grupo@1": {
+          "dif": 0.0247,
+          "ic95": [
+            0.0096,
+            0.0387
+          ],
+          "melhora": 277,
+          "piora": 205
+        },
+        "grupo@3": {
+          "dif": 0.0257,
+          "ic95": [
+            0.013,
+            0.0377
+          ],
+          "melhora": 214,
+          "piora": 139
+        },
+        "subclasse@1": {
+          "dif": 0.0161,
+          "ic95": [
+            0.0031,
+            0.0291
+          ],
+          "melhora": 214,
+          "piora": 167
+        },
+        "subclasse@3": {
+          "dif": 0.0096,
+          "ic95": [
+            0.0,
+            0.0192
+          ],
+          "melhora": 119,
+          "piora": 91
+        }
+      }
+    },
+    "q8_C": {
+      "meta": {
+        "status": "completo",
+        "csv_sha256": "20015d751e1a48382a9ec093ce013cc619c10b7c250bb6c21561f180f07ceeb8",
+        "rows": 20697,
+        "model": "Qwen/Qwen3-Embedding-8B",
+        "model_revision": null,
+        "version": "C",
+        "text_template": "patente_titulo_resumo_reivindicacoes_v1",
+        "max_tokens": 8192,
+        "sufixo_especial_preservado": [
+          151643
+        ],
+        "block_size": 128,
+        "dimension": 4096,
+        "dtype": "float16",
+        "normalized": true,
+        "transformers_version": "5.23.0",
+        "blocks": 162,
+        "completed_rows": 20697,
+        "truncated_rows": 495
+      },
+      "dimensao": 4096,
+      "validation": {
+        "grupo_hit@1": 0.5925546448087432,
+        "grupo_hit@3": 0.75,
+        "grupo_hit@5": 0.805327868852459,
+        "subclasse_hit@1": 0.7397540983606558,
+        "subclasse_hit@3": 0.8883196721311475,
+        "recall@5_raros": 0.3560105680317041,
+        "recall@5_frequentes": 0.7024896265560165,
+        "n": 2928
+      },
+      "test": {
+        "grupo_hit@1": 0.5705962988348183,
+        "grupo_hit@3": 0.7354352296093215,
+        "grupo_hit@5": 0.7978067169294037,
+        "subclasse_hit@1": 0.7230980123372173,
+        "subclasse_hit@3": 0.8831391363947909,
+        "recall@5_raros": 0.3567289117836446,
+        "recall@5_frequentes": 0.6847372810675563,
+        "n": 2918
+      },
+      "teste_longos": {
+        "grupo_hit@1": 0.7121212121212122,
+        "grupo_hit@3": 0.8454545454545455,
+        "grupo_hit@5": 0.9121212121212121,
+        "subclasse_hit@1": 0.8181818181818182,
+        "subclasse_hit@3": 0.9454545454545454,
+        "recall@5_raros": 0.3709677419354839,
+        "recall@5_frequentes": 0.6260257913247362,
+        "n": 330
+      },
+      "teste_curtos": {
+        "grupo_hit@1": 0.5525502318392581,
+        "grupo_hit@3": 0.7214064914992272,
+        "grupo_hit@5": 0.7832302936630603,
+        "subclasse_hit@1": 0.7109737248840804,
+        "subclasse_hit@3": 0.875193199381762,
+        "recall@5_raros": 0.3554933519944017,
+        "recall@5_frequentes": 0.697438498605123,
+        "n": 2588
+      },
+      "comparacao_gemma2_teste": {
+        "grupo@1": {
+          "dif": 0.0391,
+          "ic95": [
+            0.0233,
+            0.0538
+          ],
+          "melhora": 297,
+          "piora": 183
+        },
+        "grupo@3": {
+          "dif": 0.0363,
+          "ic95": [
+            0.0243,
+            0.048
+          ],
+          "melhora": 224,
+          "piora": 118
+        },
+        "subclasse@1": {
+          "dif": 0.0223,
+          "ic95": [
+            0.0082,
+            0.036
+          ],
+          "melhora": 230,
+          "piora": 165
+        },
+        "subclasse@3": {
+          "dif": 0.0199,
+          "ic95": [
+            0.0099,
+            0.0295
+          ],
+          "melhora": 137,
+          "piora": 79
+        }
+      }
+    },
+    "q8_media_TA_C": {
+      "meta": {
+        "composicao": "media",
+        "partes": [
+          {
+            "status": "completo",
+            "csv_sha256": "4c5074700129415edb86f4a999d7305e68a70e59c89258bd986a43c2f0922f62",
+            "rows": 20697,
+            "model": "Qwen/Qwen3-Embedding-8B",
+            "model_revision": null,
+            "version": "TA",
+            "text_template": "patente_titulo_resumo_reivindicacoes_v1",
+            "max_tokens": 4096,
+            "block_size": 128,
+            "dimension": 4096,
+            "dtype": "float16",
+            "normalized": true,
+            "transformers_version": "5.20.1",
+            "blocks": 162,
+            "completed_rows": 20697,
+            "truncated_rows": 0
+          },
+          {
+            "status": "completo",
+            "csv_sha256": "20015d751e1a48382a9ec093ce013cc619c10b7c250bb6c21561f180f07ceeb8",
+            "rows": 20697,
+            "model": "Qwen/Qwen3-Embedding-8B",
+            "model_revision": null,
+            "version": "C",
+            "text_template": "patente_titulo_resumo_reivindicacoes_v1",
+            "max_tokens": 8192,
+            "sufixo_especial_preservado": [
+              151643
+            ],
+            "block_size": 128,
+            "dimension": 4096,
+            "dtype": "float16",
+            "normalized": true,
+            "transformers_version": "5.23.0",
+            "blocks": 162,
+            "completed_rows": 20697,
+            "truncated_rows": 495
+          }
+        ],
+        "model": "Qwen/Qwen3-Embedding-8B"
+      },
+      "dimensao": 4096,
+      "validation": {
+        "grupo_hit@1": 0.5853825136612022,
+        "grupo_hit@3": 0.7585382513661202,
+        "grupo_hit@5": 0.8090846994535519,
+        "subclasse_hit@1": 0.7414617486338798,
+        "subclasse_hit@3": 0.8985655737704918,
+        "recall@5_raros": 0.37780713342140027,
+        "recall@5_frequentes": 0.6985477178423236,
+        "n": 2928
+      },
+      "test": {
+        "grupo_hit@1": 0.5764222069910898,
+        "grupo_hit@3": 0.7440027416038383,
+        "grupo_hit@5": 0.8022618231665525,
+        "subclasse_hit@1": 0.7347498286497601,
+        "subclasse_hit@3": 0.8848526387936944,
+        "recall@5_raros": 0.3696072118480361,
+        "recall@5_frequentes": 0.6886989157631359,
+        "n": 2918
+      },
+      "teste_longos": {
+        "grupo_hit@1": 0.7212121212121212,
+        "grupo_hit@3": 0.8818181818181818,
+        "grupo_hit@5": 0.9242424242424242,
+        "subclasse_hit@1": 0.8242424242424242,
+        "subclasse_hit@3": 0.9575757575757575,
+        "recall@5_raros": 0.3951612903225806,
+        "recall@5_frequentes": 0.6295427901524033,
+        "n": 330
+      },
+      "teste_curtos": {
+        "grupo_hit@1": 0.5579598145285936,
+        "grupo_hit@3": 0.7264296754250387,
+        "grupo_hit@5": 0.7867078825347759,
+        "subclasse_hit@1": 0.723338485316847,
+        "subclasse_hit@3": 0.875579598145286,
+        "recall@5_raros": 0.36738978306508047,
+        "recall@5_frequentes": 0.7014963225970073,
+        "n": 2588
+      },
+      "comparacao_gemma2_teste": {
+        "grupo@1": {
+          "dif": 0.0449,
+          "ic95": [
+            0.0298,
+            0.0586
+          ],
+          "melhora": 290,
+          "piora": 159
+        },
+        "grupo@3": {
+          "dif": 0.0449,
+          "ic95": [
+            0.0325,
+            0.0576
+          ],
+          "melhora": 238,
+          "piora": 107
+        },
+        "subclasse@1": {
+          "dif": 0.0339,
+          "ic95": [
+            0.0212,
+            0.0459
+          ],
+          "melhora": 230,
+          "piora": 131
+        },
+        "subclasse@3": {
+          "dif": 0.0216,
+          "ic95": [
+            0.0123,
+            0.0315
+          ],
+          "melhora": 130,
+          "piora": 67
+        }
+      }
+    }
+  }
+}
