@@ -10,6 +10,9 @@ reivindicações. Este repositório reúne os dados de rótulos, os scripts, os 
 > nas duas amostras, acerta o **grupo principal em 59,5%** dos pedidos na 1ª sugestão (75,6% entre as 3 primeiras) e a
 > **subclasse em 74,2%** (89,2% entre as 3 primeiras) — **+4,4 pontos** sobre o Gemma 2 em produção no grupo Hit@1
 > (IC 95%: +3,0 a +5,9).
+>
+> Na **prova independente** (7.888 pedidos inéditos de 2024–2025, só título e resumo), os Qwen 8B e 4B acertam o grupo
+> principal em 53% dos pedidos na 1ª sugestão e em 79% entre as 5 primeiras, cerca de 4,4 pontos acima do Gemma 2.
 
 ---
 
@@ -215,6 +218,54 @@ Leituras:
 - **Pedidos longos são mais fáceis** (reivindicações extensas e técnicas), desde que o token final seja preservado.
 - Custo: Qwen 8B ≈ 16 GB de GPU para gerar vetores; 4B ≈ 8 GB; Gemma 2 (300M) roda em CPU/Mac.
 
+### Prova independente — pedidos inéditos de 2024 e 2025
+
+Os modelos treinados nas Amostras 1 + 2 foram avaliados uma única vez num **conjunto de prova** que nenhum modelo viu
+em nenhuma etapa (treino, validação ou teste): **7.888 pedidos inéditos** de três amostras aleatórias da base de
+patentes — publicação 2024–2025 (4.835), depósito 2024 (2.424) e depósito 2025 (629). Foram excluídos todos os pedidos
+das Amostras 1 e 2 (pelo número do pedido ou pelo texto: mesmo título e resumo, ou mesmo resumo) e as repetições
+entre as próprias amostras; 7.479 pedidos têm ao menos um grupo no universo do classificador.
+
+- **Notebook (Colab A100):** <https://colab.research.google.com/drive/13i6TGSs-HripSv-7xQ3_zL_6IoKYOLHz?usp=sharing>
+- **Resultados completos:** `consulta_gemma/qwen8b/resultados/resultados_prova_v4.json`
+- **Entrada só TA:** a prova tem apenas título e resumo, que entram com o vetor TA em classificadores treinados com a
+  média TA + Claims (na parte da Amostra 1 repetida na prova, isso custou cerca de 2,5 pontos no grupo@1 do Qwen 8B).
+  Os números são, portanto, conservadores.
+- **Precisão@5** = fração das 5 sugestões de grupo que é verdadeira (os pedidos têm em média 3 IPC, então o máximo
+  fica bem abaixo de 1); **Revocação@5** = fração dos grupos verdadeiros do pedido que aparece entre as 5.
+
+Total da prova (7.479 pedidos no grupo; 7.877 na subclasse):
+
+| Modelo | Grupo@1 | Grupo@3 | Grupo@5 | Precisão@5 | Revocação@5 | Sub@1 | Sub@3 |
+|---|---|---|---|---|---|---|---|
+| **Qwen3-8B** | **0,532** | 0,721 | **0,791** | **0,247** | **0,626** | **0,688** | **0,862** |
+| Qwen3-4B | 0,531 | **0,723** | **0,791** | **0,247** | **0,626** | 0,685 | 0,859 |
+| Gemma 2 (produção) | 0,488 | 0,686 | 0,755 | 0,231 | 0,587 | 0,656 | 0,837 |
+| Qwen3-0.6B | 0,479 | 0,670 | 0,734 | 0,224 | 0,567 | 0,632 | 0,812 |
+| TF-IDF + LinearSVC | 0,455 | 0,636 | 0,698 | 0,214 | 0,535 | 0,602 | 0,788 |
+| BGE-M3 | 0,448 | 0,635 | 0,709 | 0,212 | 0,535 | 0,607 | 0,790 |
+
+Por amostra (grupo@1 / grupo@5; entre parênteses, pedidos com grupo no universo):
+
+| Modelo | Publicação 2024-25 (4.667) | Depósito 2024 (2.236) | Depósito 2025 (576) |
+|---|---|---|---|
+| Qwen3-8B | 0,571 / 0,821 | 0,468 / 0,746 | 0,460 / 0,729 |
+| Qwen3-4B | 0,576 / 0,822 | 0,458 / 0,741 | 0,460 / 0,733 |
+| Gemma 2 (produção) | 0,525 / 0,789 | 0,432 / 0,697 | 0,411 / 0,707 |
+| Qwen3-0.6B | 0,522 / 0,775 | 0,412 / 0,667 | 0,398 / 0,663 |
+| TF-IDF + LinearSVC | 0,507 / 0,742 | 0,369 / 0,627 | 0,366 / 0,622 |
+| BGE-M3 | 0,496 / 0,751 | 0,371 / 0,643 | 0,356 / 0,628 |
+
+Leituras da prova:
+- **A ordem dos modelos se mantém** em relação ao teste de 2026: Qwen 4B/8B > Gemma 2 > Qwen 0.6B > TF-IDF ≈ BGE-M3.
+  Os dois Qwen maiores ficam cerca de **4,4 pontos acima do Gemma 2 de produção** no grupo@1.
+- **Com entrada só TA, o Qwen 8B empata com o 4B** (diferença de 0,1 ponto), ao contrário do teste de 2026 com TA + C
+  (+2,3 pontos para o 8B). A vantagem do 8B parece vir das reivindicações.
+- **As amostras por depósito são mais difíceis** que a de publicação (cerca de 10 pontos a menos no grupo@1, em todos
+  os modelos); o motivo ainda não foi investigado.
+- Os números absolutos ficam abaixo do teste de 2026 (Qwen 8B: 0,532 contra 0,595 no grupo@1), coerente com a
+  entrada só TA e com pedidos de outra distribuição.
+
 ## 9. Linha de base TF-IDF
 
 Pasta `TF-IDF/` (detalhes em `TF-IDF/LEIAME.md`):
@@ -247,8 +298,8 @@ Pasta `TF-IDF/` (detalhes em `TF-IDF/LEIAME.md`):
 - **Até 5 IPC por pedido no XML** da amostra 1: pedidos com mais classificações podem ter rótulos incompletos, o que
   penaliza um pouco as métricas.
 - **O teste foi consultado várias vezes** ao longo da comparação (sempre o mesmo conjunto de 2.918 pedidos). As
-  diferenças grandes são robustas, mas, para um número final sem viés, é preciso um **terceiro conjunto independente**
-  (ver seção 15).
+  diferenças grandes são robustas; o número sem viés vem da **prova independente** com pedidos inéditos de 2024–2025
+  (seção 8), feita uma única vez.
 - **Concordância só 1:1**: rótulos antigos que se dividiram em vários grupos novos permanecem como estavam.
 - O "TAC" de referência é sempre a **média de vetores** TA e C; o TAC concatenado aparece só como comparação.
 
@@ -338,7 +389,7 @@ consulta_gemma/                  pipeline Gemma 2 (produção da API)
     teste_pos_weight.py          experimento de peso por frequência
     poc1_rotulos.csv.gz, poc1_universo.json, vetores/v2_rotulos_e_ref.npz
     modelos/                     pesos v1+v2 (média TA+C): Qwen 0.6B, 4B, 8B e BGE-M3
-    resultados/                  métricas e acertos por pedido de cada experimento
+    resultados/                  métricas e acertos por pedido de cada experimento; resultados_prova_v4.json = prova independente
 TF-IDF/                          linha de base TF-IDF (scripts, resultados, LEIAME.md)
 ```
 
