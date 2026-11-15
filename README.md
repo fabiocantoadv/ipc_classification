@@ -336,17 +336,3 @@ pip install -r requirements.txt
 5. **Gemma 2 / API** — `consulta_gemma/train_v2.py` e `consulta_gemma/export_v2.py` (precisam dos CSVs e dos vetores
    Gemma).
 
-Todos os passos são determinísticos (sementes fixas: divisão 42, treino 0).
-
-## 15. Próximos passos
-
-- **Decidir o modelo de produção**: Qwen 8B (melhor, ≈ 16 GB de GPU), Qwen 4B (−2,3 pontos, ≈ 8 GB) ou manter o
-  Gemma 2 (300M, roda sem GPU).
-- Aplicar o pos_weight atenuado e a limpeza das marcações de imagem aos Qwen.
-- **Modelo final**: treinar com todos os pedidos das duas amostras (treino + validação + teste) e avaliar num **terceiro
-  conjunto independente**, com título, resumo **e reivindicações** (TAC), já que a média TA+C é a melhor entrada.
-- Ampliar o benchmark qualificado de busca (Edson), sem sobreposição com o treino.
-
-## Créditos
-
-Projeto PatenteIA — IBICT e INPI. Desenvolvimento e experimentos: Fábio Canto, com apoio do Claude (Anthropic).
