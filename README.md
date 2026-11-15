@@ -140,24 +140,87 @@ O "TAC" de referência do projeto é a média de dois vetores (assim foi feito n
 
 ## 6. O classificador hierárquico
 
-Mesma receita para todos os embeddings (notebook `consulta_gemma/qwen8b/classificador_ipc_qwen8b.ipynb`):
+### O modelo: regressão logística um-contra-todos sobre embeddings congelados
 
-1. **Dois modelos lineares independentes**, um para os 2.585 grupos e outro para as 575 subclasses: regressão
-   logística **um-contra-todos** (uma sigmoide por rótulo, perda BCE).
-2. Otimização: **Adam** (lr 0,02; β 0,9 / 0,999), **lotes de 1.024**, **30 épocas**, **sem regularização (λ = 0)**,
-   viés inicial pelo log-odds da frequência de cada rótulo, semente 0.
-3. Entrada: embedding L2-normalizado (TA, C ou média TA+C).
-4. **Decodificação hierárquica**:
-   - nota do grupo = `log σ(grupo) + log σ(subclasse-mãe)`;
-   - as subclasses são ordenadas pelo **melhor grupo** que contêm.
+O classificador é uma **regressão logística multirrótulo no esquema um-contra-todos** (*one-vs-rest*), treinada sobre
+os embeddings. Os modelos de embeddings (Qwen3, Gemma 2, BGE-M3) **não são ajustados**: funcionam só como extratores
+de vetores, e quem aprende é uma camada linear por cima deles (o que a literatura chama de *linear probe*).
 
-   Assim, a lista de grupos e a de subclasses são **100% coerentes** (o grupo sugerido sempre pertence à subclasse
-   sugerida). Em relação à decodificação plana, o efeito na precisão é pequeno e não significativo (+0,3 a +0,6 ponto
-   no grupo, −0,5 a −0,7 na subclasse); o ganho é a coerência.
+- **Um contra todos:** cada rótulo (cada grupo principal, cada subclasse) tem o seu próprio classificador binário,
+  "é este rótulo / não é", com uma sigmoide própria. As probabilidades são independentes, e por isso o mesmo pedido
+  pode receber várias IPC (problema multirrótulo). É o mesmo princípio do `OneVsRestClassifier` do scikit-learn
+  (documentação: [OneVsRestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.multiclass.OneVsRestClassifier.html)
+  e [guia de classificação multiclasse e multirrótulo](https://scikit-learn.org/stable/modules/multiclass.html)); aqui,
+  todos os rótulos de um nível são treinados juntos como uma única camada linear, em PyTorch.
+- **Dois classificadores independentes**, um por nível da IPC:
+  - **grupo principal:** 2.585 saídas;
+  - **subclasse:** 575 saídas.
+- **Forma:** para um vetor `x` (L2-normalizado), a nota de cada rótulo é `z = W·x + b` e a probabilidade é `σ(z)`.
+  Cada classificador é só uma matriz de pesos `W` (rótulos × dimensão do embedding) e um vetor de viés `b`:
 
-Exportação para a API: `consulta_gemma/export_v2.py` (Gemma de produção). Pesos v1+v2 dos demais:
-`consulta_gemma/qwen8b/modelos/modelo_{qwen06b,qwen4b,qwen8b,bgem3}_media_v1v2.npz` (`grupo_W`, `grupo_b`, `subclasse_W`, `subclasse_b`,
-`grupos`, `subclasses`).
+  | Embedding | Dimensão | Parâmetros (grupo + subclasse) |
+  |---|---|---|
+  | Gemma 2 | 768 | 2,4 milhões |
+  | Qwen3 0.6B, BGE-M3 | 1.024 | 3,2 milhões |
+  | Qwen3 4B | 2.560 | 8,1 milhões |
+  | Qwen3 8B | 4.096 | 12,9 milhões |
+
+### Treino
+
+Mesma receita para todos os embeddings (notebook `consulta_gemma/qwen8b/classificador_ipc_qwen8b.ipynb` e
+`treino_v1v2_qwen.py`):
+
+1. **Entrada:** embedding L2-normalizado — no modelo final, a média dos vetores TA e Claims, renormalizada.
+2. **Perda:** entropia cruzada binária por rótulo (BCE; equivalente a
+   [`BCEWithLogitsLoss`](https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html) do PyTorch).
+3. **Otimização:** [Adam](https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html) (lr 0,02; β 0,9 / 0,999),
+   **lotes de 1.024**, **30 épocas** (passadas completas pelo treino), **sem regularização (λ = 0)**, semente 0.
+4. **Viés inicial** pelo log-odds da frequência de cada rótulo no treino (os rótulos raros começam com probabilidade
+   baixa, o que estabiliza o início do treino).
+5. Os hiperparâmetros foram fixados na 1ª rodada e mantidos em todos os modelos, para que a comparação entre
+   embeddings seja justa.
+
+### Decodificação hierárquica
+
+Os dois níveis são combinados na hora de sugerir as classificações:
+- nota do grupo = `log σ(grupo) + log σ(subclasse-mãe)` — um grupo só fica bem colocado se a sua subclasse também for
+  provável;
+- as subclasses são ordenadas pelo **melhor grupo** que contêm.
+
+Assim, a lista de grupos e a de subclasses são **100% coerentes** (o grupo sugerido sempre pertence à subclasse
+sugerida). Em relação à decodificação plana, o efeito na precisão é pequeno e não significativo (+0,3 a +0,6 ponto
+no grupo, −0,5 a −0,7 na subclasse); o ganho é a coerência.
+
+### Classificar um pedido novo
+
+```python
+import numpy as np
+m = np.load("consulta_gemma/qwen8b/modelos/modelo_qwen8b_media_v1v2.npz")
+x = (v_ta + v_claims) / 2; x /= np.linalg.norm(x)            # vetores do mesmo modelo de embeddings
+zg = m["grupo_W"] @ x + m["grupo_b"]; zs = m["subclasse_W"] @ x + m["subclasse_b"]
+log_sig = lambda z: -np.logaddexp(0, -z)
+pai = [list(m["subclasses"]).index(g[:4]) for g in m["grupos"]]   # subclasse-mãe de cada grupo
+nota = log_sig(zg) + log_sig(zs)[pai]
+top5 = [m["grupos"][i] for i in np.argsort(-nota)[:5]]
+```
+
+Os arquivos de pesos `modelo_{qwen06b,qwen4b,qwen8b,bgem3}_media_v1v2.npz` trazem `grupo_W`, `grupo_b`,
+`subclasse_W`, `subclasse_b`, `grupos` e `subclasses` (os códigos na ordem das linhas de `W`). O Gemma 2 de
+produção é exportado para a API por `consulta_gemma/export_v2.py`, no formato `coef` / `intercept` / `classes`.
+
+### O classificador do TF-IDF (linha de base)
+
+Para o TF-IDF a receita é outra, mais adequada a vetores esparsos de 80 mil dimensões:
+- [`LinearSVC`](https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html) (máquina de vetores de
+  suporte linear; C = 0,5, `class_weight="balanced"`) dentro de um
+  [`OneVsRestClassifier`](https://scikit-learn.org/stable/modules/generated/sklearn.multiclass.OneVsRestClassifier.html),
+  um por nível (≈ 253 milhões de parâmetros no total);
+- o SVM devolve margens, não probabilidades: elas são convertidas por **calibração de Platt** — `p = σ(a·margem + b)`,
+  um par `a, b` por nível, ajustado na validação (ver o
+  [guia de calibração de probabilidades](https://scikit-learn.org/stable/modules/calibration.html));
+- depois, a mesma decodificação hierárquica.
+
+A receita logística dos embeddings aplicada ao TF-IDF fica bem abaixo (seção 9).
 
 ## 7. Métricas e comparação estatística
 
