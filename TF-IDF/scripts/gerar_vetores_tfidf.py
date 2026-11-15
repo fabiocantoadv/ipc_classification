@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gera e grava, na pasta TF-IDF, os vetorizadores e as matrizes TF-IDF das duas épocas.
+"""Gera e grava, na pasta TF-IDF, os vetorizadores e as matrizes TF-IDF das duas amostras.
 
 Os vetorizadores são reajustados exatamente como no treino dos modelos (treino_tfidf_svc.py): mesmos textos de treino
 (título + resumo + todas as reivindicações), mesmos parâmetros. O ajuste é determinístico, então reproduz o vocabulário
@@ -23,7 +23,7 @@ IDS, IDX = g['IDS'], g['IDX']
 spec = importlib.util.spec_from_file_location('bl', ROOT / 'baseline.py'); bl = importlib.util.module_from_spec(spec); spec.loader.exec_module(bl)
 csv.field_size_limit(sys.maxsize)
 
-# textos: 1ª época na ordem do CSV completo (20.697), 2ª época na ordem do dataset_ipc_v2 (25.563)
+# textos: Amostra 1 na ordem do CSV completo (20.697), Amostra 2 na ordem do dataset_ipc_v2 (25.563)
 linhas1 = list(csv.DictReader(open(ROOT / 'patentes_xml_embeddings_ipc.csv', encoding='utf-8-sig')))
 ids1 = [r['numero_pedido'].strip() for r in linhas1]; T1 = [bl.make_text(r, 'all_claims') for r in linhas1]
 pos1 = {n: i for i, n in enumerate(ids1)}
@@ -59,15 +59,15 @@ def gravar_matriz(X, ids, pasta, origem):
                'normalizacao': 'L2 por linha (padrão do TfidfVectorizer)'}, open(pasta / 'metadata.json', 'w'), ensure_ascii=False, indent=1)
     print(f'  {pasta.relative_to(TF)}: {X.shape}, {X.nnz:,} não zeros ({time.time()-t0:.0f}s)', flush=True)
 
-# vetorizador v1 (usado pelos modelos svc_v1_*): só o treino da 1ª época
+# vetorizador v1 (usado pelos modelos svc_v1_*): só o treino da Amostra 1
 vec1 = vetorizador().fit(treino1); gravar_vetorizador(vec1, 'v1')
-gravar_matriz(vec1.transform(T1), ids1, TF / 'vetores/vetorizador_v1/epoca1', 'patentes_xml_embeddings_ipc.csv (todas as linhas)')
+gravar_matriz(vec1.transform(T1), ids1, TF / 'vetores/vetorizador_v1/amostra1', 'patentes_xml_embeddings_ipc.csv (todas as linhas)')
 del vec1
-# vetorizador v1v2 (usado pelos modelos svc_v1v2_*): treino da 1ª + treino da 2ª época
+# vetorizador v1v2 (usado pelos modelos svc_v1v2_*): treino da Amostra 1 + treino da Amostra 2
 vec = vetorizador().fit(treino1 + [T2[i] for i in np.where(mg | ms)[0]]); gravar_vetorizador(vec, 'v1v2')
 X1 = vec.transform(T1); X2 = vec.transform(T2)
-gravar_matriz(X1, ids1, TF / 'vetores/vetorizador_v1v2/epoca1', 'patentes_xml_embeddings_ipc.csv (todas as linhas)')
-gravar_matriz(X2, ids2, TF / 'vetores/vetorizador_v1v2/epoca2', 'dataset_ipc_v2.csv (todas as linhas)')
+gravar_matriz(X1, ids1, TF / 'vetores/vetorizador_v1v2/amostra1', 'patentes_xml_embeddings_ipc.csv (todas as linhas)')
+gravar_matriz(X2, ids2, TF / 'vetores/vetorizador_v1v2/amostra2', 'dataset_ipc_v2.csv (todas as linhas)')
 
 # conferência: vetorizador regerado + modelos gravados reproduzem os acertos do teste
 res = json.load(open(TF / 'resultados/resultado_svc_v1v2.json'))

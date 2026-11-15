@@ -8,12 +8,12 @@ sublinear_tf, até 80.000 termos, L2 por linha. Vetores esparsos (80 mil dimens�
 - `vetorizadores/` — vetorizador ajustado em cada versão de treino: `vetorizador_v1.joblib` e `vetorizador_v1v2.joblib`
   (scikit-learn 1.9.1, ambiente patenteia_search/semantic_api/.venv). Cópia portátil, independente de versão:
   `*_vocabulario.json` (termo → coluna, parâmetros) e `*_idf.npy`.
-- `vetores/vetorizador_v1/epoca1/` e `vetores/vetorizador_v1v2/{epoca1,epoca2}/` — matrizes esparsas
+- `vetores/vetorizador_v1/amostra1/` e `vetores/vetorizador_v1v2/{amostra1,amostra2}/` — matrizes esparsas
   (`matriz.npz`, abrir com `scipy.sparse.load_npz`) + `pedidos.csv` (mesma ordem das linhas) + `metadata.json`.
-  1ª época = todas as 20.697 linhas de patentes_xml_embeddings_ipc.csv; 2ª época = 25.563 linhas de dataset_ipc_v2.csv.
+  Amostra 1 = todas as 20.697 linhas de patentes_xml_embeddings_ipc.csv; Amostra 2 = 25.563 linhas de dataset_ipc_v2.csv.
   Use a matriz do mesmo vetorizador do modelo.
 - `modelos_svc/` — OneVsRest LinearSVC(C=0,5, class_weight="balanced"), grupo (2.585) e subclasse (575);
-  `svc_v1_*` (treino 1ª época) e `svc_v1v2_*` (treino 1ª + 2ª). Calibração de Platt (a, b por nível) em
+  `svc_v1_*` (treino só na Amostra 1) e `svc_v1v2_*` (treino nas Amostras 1 + 2). Calibração de Platt (a, b por nível) em
   `resultados/resultado_svc_*.json` → `calibracao`.
 - `resultados/` — métricas no teste de 2026 (2.918 pedidos) e acertos por pedido (`pp_teste`).
   `resultado_svc_*`: melhor receita (LinearSVC + hierarquia). `resultado_v1*.json`: receita dos embeddings (Adam), inferior.

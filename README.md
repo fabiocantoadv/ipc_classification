@@ -28,7 +28,6 @@ reivindicações. Este repositório reúne os dados de rótulos, os scripts, os 
 12. [Embeddings no Google Drive](#12-embeddings-no-google-drive)
 13. [Mapa do repositório](#13-mapa-do-repositório)
 14. [Como reproduzir](#14-como-reproduzir)
-15. [Próximos passos](#15-próximos-passos)
 
 ---
 
@@ -55,7 +54,7 @@ classificações e para reordenar resultados.
 Os textos completos dos pedidos **não estão no repositório** (são extraídos da base do INPI); aqui estão os rótulos, os
 identificadores, os índices de divisão e os resultados. Os embeddings estão no Google Drive (seção 12).
 
-### Amostra 1 — "1ª época" (PoC 1, pedidos de 2026)
+### Amostra 1 (PoC 1, pedidos de 2026)
 - Origem: XML dos pedidos publicados em 2026 na base do INPI (amostra da PoC 1).
 - **20.697 pedidos**, dos quais **19.411 têm IPC** utilizável no universo de rótulos.
 - Campos: título, resumo, reivindicações e IPC.
@@ -63,7 +62,7 @@ identificadores, os índices de divisão e os resultados. Os embeddings estão n
 - Observação: nas reivindicações há marcações de imagem do tipo `[Imagem: imgf0001.tif]` (fórmulas químicas e tabelas
   convertidas em figura) — 1.883 pedidos, 51% deles da classe C07. Ver seção 11.
 
-### Amostra 2 — "2ª época" (`dataset_ipc_v2`)
+### Amostra 2 (`dataset_ipc_v2`)
 - Montada por `preparacao_dados/montar_dataset_ipc.py` a partir de pedidos com IPC de outros anos de depósito.
 - **25.563 pedidos**, identificados por `numero_base`.
 - Classificações atualizadas para a IPC 2026.01 pela concordância da OMPI (seção 3).
@@ -89,6 +88,10 @@ identificadores, os índices de divisão e os resultados. Os embeddings estão n
 |---|---|---|---|---|
 | Amostra 1 | 13.565 | 2.928 | **2.918** | `GroupShuffleSplit` por hash de título+resumo (duplicados ficam juntos), semente 42 |
 | Amostra 2 | 80% | 10% | 10% | estratificado pela subclasse principal, agrupando duplicados |
+
+Terminologia: **Amostra 1 / Amostra 2** são os conjuntos de dados; **1ª rodada (v1)** e **2ª rodada (v1+v2)** são os
+treinos; **época** é usada só no sentido de aprendizado de máquina (uma passada completa do otimizador pelo treino — a
+receita usa 30); **conjunto de prova** é a avaliação independente (pedidos que nenhum modelo viu).
 
 - **Treino v1**: só o treino da amostra 1.
 - **Treino v1+v2**: treino da amostra 1 + treino da amostra 2 → 13.565 + **18.629** (modelo de grupo) e 13.565 +
@@ -255,7 +258,7 @@ Pasta: <https://drive.google.com/drive/folders/1Kcd-IbHtDNbuP2B8m8cNt2wH3Ob-fKLy
 
 ```
 Embeddings/
-├── Amostra_1/                          # 1ª época — PoC 1, pedidos de 2026, 20.697 linhas (numero_pedido)
+├── Amostra_1/                          # Amostra 1 — PoC 1, pedidos de 2026, 20.697 linhas (numero_pedido)
 │   ├── BGE_M3_hybrid_a1/
 │   │   ├── C/                          # BGE_M3_hybrid_a1_C.tar.zst + config.json + resultado.json
 │   │   ├── TA/                         # BGE_M3_hybrid_a1_TA.tar.zst + config.json + resultado.json
@@ -270,7 +273,7 @@ Embeddings/
 │   │   ├── 8B_C/, 8B_TA/
 │   │   └── 8B_TAC/                     # embeddings_TAC.npy + pedidos.csv + metadata.json (arquivo único)
 │   └── metadados_TAC_amostra_1.csv     # metadados dos pedidos da amostra
-├── Amostra_2/                          # 2ª época — dataset_ipc_v2, 25.563 linhas (numero_base)
+├── Amostra_2/                          # Amostra 2 — dataset_ipc_v2, 25.563 linhas (numero_base)
 │   ├── BGE_M3_hybrid_a2/
 │   │   ├── C/                          # BGE_M3_hybrid_a2_C_blocos_00000-00099.tar.zst e _00100-00199.tar.zst
 │   │   ├── TA/                         # BGE_M3_hybrid_a2_TA_blocos_00000-00099.tar.zst e _00100-00199.tar.zst
@@ -289,8 +292,8 @@ Embeddings/
     ├── resultados/                     # 5 arquivos .json
     ├── scripts/                        # 3 scripts .py
     ├── vetores/
-    │   ├── vetorizador_v1/epoca1/      # matriz.npz + metadata.json + pedidos.csv
-    │   └── vetorizador_v1v2/{epoca1, epoca2}/
+    │   ├── vetorizador_v1/amostra1/    # matriz.npz + metadata.json + pedidos.csv
+    │   └── vetorizador_v1v2/{amostra1, amostra2}/
     ├── vetorizadores/                  # vetorizador_v1 e v1v2: .joblib + vocabulário .json + idf .npy
     └── LEIAME.md
 ```
@@ -366,17 +369,3 @@ pip install -r requirements.txt
 5. **Gemma 2 / API** — `consulta_gemma/train_v2.py` e `consulta_gemma/export_v2.py` (precisam dos CSVs e dos vetores
    Gemma).
 
-Todos os passos são determinísticos (sementes fixas: divisão 42, treino 0).
-
-## 15. Próximos passos
-
-- **Decidir o modelo de produção**: Qwen 8B (melhor, ≈ 16 GB de GPU), Qwen 4B (−2,3 pontos, ≈ 8 GB) ou manter o
-  Gemma 2 (300M, roda sem GPU).
-- Aplicar o pos_weight atenuado e a limpeza das marcações de imagem aos Qwen.
-- **Modelo final**: treinar com todos os pedidos das duas amostras (treino + validação + teste) e avaliar num **terceiro
-  conjunto independente**, com título, resumo **e reivindicações** (TAC), já que a média TA+C é a melhor entrada.
-- Ampliar o benchmark qualificado de busca (Edson), sem sobreposição com o treino.
-
-## Créditos
-
-Projeto PatenteIA — IBICT e INPI. Desenvolvimento e experimentos: Fábio Canto, com apoio do Claude (Anthropic).

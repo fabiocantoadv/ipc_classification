@@ -5,7 +5,7 @@ Representação: o vetorizador do baseline.py original (palavras + bigramas, sem
 sublinear_tf, até 80 mil termos; texto = título + resumo + todas as reivindicações), ajustado só no treino.
 Receita: logística um-contra-todos, Adam (lr 0,02), lotes de 1.024, 30 épocas, sem penalidade; modelos de grupo
 e de subclasse; decodificação hierárquica; mesma divisão, universo de rótulos e métricas do
-classificador_ipc_qwen8b.ipynb. v1v2 = treino da 1ª época + treino da 2ª (mesmas máscaras do Qwen/Gemma).
+classificador_ipc_qwen8b.ipynb. v1v2 = treino da Amostra 1 + treino da Amostra 2 (mesmas máscaras do Qwen/Gemma).
 
 Rodar no Mac, a partir de ~/Downloads/predicao_ipc:
     patenteia_search/semantic_api/.venv/bin/python consulta_gemma/qwen8b/tfidf/treino_tfidf.py v1
