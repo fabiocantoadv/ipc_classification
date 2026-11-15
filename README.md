@@ -1,9 +1,9 @@
 # Classificador IPC de pedidos de patente (PatenteIA — IBICT / INPI)
 
 Classificador que sugere, para um pedido de patente brasileiro, os **grupos principais** e as **subclasses** da
-Classificação Internacional de Patentes (CIB/IPC) mais prováveis, a partir de **embeddings** do título, do resumo e das
+Classificação Internacional de Patentes (IPC) mais prováveis, a partir de **embeddings** do título, do resumo e das
 reivindicações. Este repositório reúne os dados de rótulos, os scripts, os notebooks e os resultados da comparação entre
-**Gemma 2 (EmbeddingGemma)**, **Qwen3-Embedding 0.6B / 4B / 8B** e uma linha de base **TF-IDF**, todos com o mesmo
+**Gemma 2 (EmbeddingGemma)**, **Qwen3-Embedding 0.6B / 4B / 8B**, **BGE-M3** e uma linha de base **TF-IDF**, todos com o mesmo
 **classificador hierárquico**.
 
 > Resultado principal (teste com 2.918 pedidos de 2026): o **Qwen3-Embedding-8B**, com a média dos vetores TA e C e treino
@@ -16,7 +16,7 @@ reivindicações. Este repositório reúne os dados de rótulos, os scripts, os 
 ## Sumário
 1. [O problema](#1-o-problema)
 2. [Dados](#2-dados)
-3. [Universo de rótulos e concordância da CIB](#3-universo-de-rótulos-e-concordância-da-cib)
+3. [Universo de rótulos e concordância da IPC](#3-universo-de-rótulos-e-concordância-da-ipc)
 4. [Divisão treino / validação / teste](#4-divisão-treino--validação--teste)
 5. [Textos e embeddings](#5-textos-e-embeddings)
 6. [O classificador hierárquico](#6-o-classificador-hierárquico)
@@ -66,12 +66,12 @@ identificadores, os índices de divisão e os resultados. Os embeddings estão n
 ### Amostra 2 — "2ª época" (`dataset_ipc_v2`)
 - Montada por `preparacao_dados/montar_dataset_ipc.py` a partir de pedidos com IPC de outros anos de depósito.
 - **25.563 pedidos**, identificados por `numero_base`.
-- IPC atualizadas para a CIB 2026.01 pela concordância da OMPI (seção 3).
+- Classificações atualizadas para a IPC 2026.01 pela concordância da OMPI (seção 3).
 - Rótulos compactados, máscaras de treino e referência por pedido do Gemma em produção:
   `consulta_gemma/qwen8b/vetores/v2_rotulos_e_ref.npz` (gerado pelo `consulta_gemma/train_v2.py`).
 - Não há sobreposição com a amostra 1 (a amostra 1 é só de 2026).
 
-## 3. Universo de rótulos e concordância da CIB
+## 3. Universo de rótulos e concordância da IPC
 
 - O **universo é fixado pela amostra 1**: grupos principais com suporte ≥ 2 no conjunto (**2.585**) e as subclasses
   correspondentes (**575**). Está em `consulta_gemma/qwen8b/poc1_universo.json` (também com a referência por pedido do
@@ -79,7 +79,7 @@ identificadores, os índices de divisão e os resultados. Os embeddings estão n
 - Rótulos da amostra 2 fora do universo são descartados; pedidos que ficam sem nenhum rótulo saem do treino.
 - **Concordância**: as IPC antigas da amostra 2 são atualizadas pelas listas de concordância "antigo → novo" da OMPI
   (revisões 2018.01 a 2026.01; faltaram 2015.01, 2016.01, 2017.01 e 2022.01). O extrator é
-  `preparacao_dados/extrair_concordancia_cib.py` e o mapa resultante, `consulta_gemma/v2/concordancia_ipc_grupos.json`.
+  `preparacao_dados/extrair_concordancia_ipc.py` e o mapa resultante, `consulta_gemma/v2/concordancia_ipc_grupos.json`.
   **Só correspondências 1:1 são aplicadas**; quando um grupo antigo se divide em vários, o rótulo original é mantido
   (evita inventar rótulos).
 
@@ -126,6 +126,12 @@ O "TAC" de referência do projeto é a média de dois vetores (assim foi feito n
 - Lotes por número de tokens, ordenados por tamanho, com divisão automática do lote se faltar memória e retomada por
   blocos.
 
+### BGE-M3 — `BAAI/bge-m3` (revisão `5617a9f61b028005a4858fdac845db406aefb181`, 1.024 dimensões)
+- Gerado no Mac (FlagEmbedding, modo híbrido), para a busca: TA = título + resumo com rótulos; C = reivindicações sem
+  rótulo; até **4.096 tokens**; vetores densos L2-normalizados + pesos esparsos (léxicos) por pedido.
+- Na busca híbrida, nota = 0,7 · cosseno denso + 0,3 · produto escalar esparso. **No classificador entra só o vetor
+  denso.**
+
 ## 6. O classificador hierárquico
 
 Mesma receita para todos os embeddings (notebook `consulta_gemma/qwen8b/classificador_ipc_qwen8b.ipynb`):
@@ -143,8 +149,8 @@ Mesma receita para todos os embeddings (notebook `consulta_gemma/qwen8b/classifi
    sugerida). Em relação à decodificação plana, o efeito na precisão é pequeno e não significativo (+0,3 a +0,6 ponto
    no grupo, −0,5 a −0,7 na subclasse); o ganho é a coerência.
 
-Exportação para a API: `consulta_gemma/export_v2.py` (Gemma de produção). Pesos dos Qwen v1+v2:
-`consulta_gemma/qwen8b/modelos/modelo_qwen{4b,8b}_media_v1v2.npz` (`grupo_W`, `grupo_b`, `subclasse_W`, `subclasse_b`,
+Exportação para a API: `consulta_gemma/export_v2.py` (Gemma de produção). Pesos v1+v2 dos demais:
+`consulta_gemma/qwen8b/modelos/modelo_{qwen06b,qwen4b,qwen8b,bgem3}_media_v1v2.npz` (`grupo_W`, `grupo_b`, `subclasse_W`, `subclasse_b`,
 `grupos`, `subclasses`).
 
 ## 7. Métricas e comparação estatística
@@ -168,6 +174,10 @@ Teste da amostra 1 (2.918 pedidos de 2026). Todos com o classificador hierárqui
 | TF-IDF + LinearSVC | TAC (texto) | v1+v2 | 0,514 | 0,693 | 0,742 | 0,675 | 0,836 | 0,314 | — |
 | Gemma 2 (300M) | média | v1 | 0,532 | 0,699 | 0,760 | 0,701 | 0,863 | — | — |
 | **Gemma 2 (produção)** | média | v1+v2 | 0,551 | 0,721 | — | 0,718 | 0,878 | — | — |
+| BGE-M3 | TA | v1 | 0,472 | 0,626 | — | 0,640 | 0,807 | 0,225 | 0,612 |
+| BGE-M3 | C | v1 | 0,459 | 0,611 | — | 0,620 | 0,787 | 0,208 | 0,594 |
+| BGE-M3 | média | v1 | 0,495 | 0,645 | — | 0,653 | 0,813 | 0,241 | 0,624 |
+| BGE-M3 | média | v1+v2 | 0,510 | 0,670 | 0,734 | 0,673 | 0,830 | 0,316 | — |
 | Qwen3 0.6B | TA | v1 | 0,503 | 0,668 | 0,729 | 0,664 | 0,837 | 0,267 | 0,636 |
 | Qwen3 0.6B | C | v1 | 0,507 | 0,672 | 0,730 | 0,670 | 0,828 | 0,269 | 0,667 |
 | Qwen3 0.6B | média | v1 | 0,526 | 0,694 | 0,745 | 0,687 | 0,849 | 0,290 | 0,682 |
@@ -190,9 +200,13 @@ Comparações pareadas (bootstrap, grupo Hit@1, em pontos percentuais):
 | Qwen 8B v1+v2 − Gemma 2 v1 | +6,4 | [+4,8; +7,9] |
 | Qwen 8B v1+v2 − Qwen 4B v1+v2 | +2,3 | [+1,1; +3,4] |
 | Qwen 8B v1+v2 − TF-IDF SVC v1+v2 | +8,1 | [+6,5; +9,8] |
+| BGE-M3 v1+v2 − Gemma 2 produção | −4,1 | [−5,5; −2,7] |
+| BGE-M3 v1+v2 − TF-IDF SVC v1+v2 | −0,4 | [−2,0; +1,2] |
 
 Leituras:
 - **Modelo maior ajuda**: 0.6B < Gemma 2 ≈ 0.6B v1+v2 < 4B < 8B.
+- **O BGE-M3 empata com o TF-IDF** (−0,4 ponto no grupo@1, não significativo) e fica 4 pontos abaixo do Gemma 2. Ao
+  contrário dos outros modelos, nele C sozinho é pior que TA — possivelmente pelo corte em 4.096 tokens.
 - **A média TA+C supera TA e C isolados** em todos os modelos; C sozinho supera TA nos maiores.
 - **Juntar a amostra 2 no treino ajuda sempre** (+1,5 a +2 pontos no grupo@1; ganhos maiores nos rótulos raros).
 - **Pedidos longos são mais fáceis** (reivindicações extensas e técnicas), desde que o token final seja preservado.
@@ -241,44 +255,60 @@ Pasta: <https://drive.google.com/drive/folders/1Kcd-IbHtDNbuP2B8m8cNt2wH3Ob-fKLy
 
 ```
 Embeddings/
-├── Amostra_1/                     # 1ª época — PoC 1, pedidos de 2026, 20.697 linhas (numero_pedido)
-│   ├── Qwen_0.6B_a1/
-│   │   ├── 06_C/                  # reivindicações
-│   │   ├── 06_TA/                 # título + resumo
-│   │   └── 06_TAC/                # texto concatenado (antigo, corte em 4.096) — só referência
-│   ├── Qwen_4B_a1/
-│   │   ├── 4B_C/
-│   │   ├── 4B_TA/
-│   │   └── TAC/                   # concatenado antigo — só referência
-│   └── Qwen_8B_a1/
-│       ├── 8B_C/
-│       ├── 8B_TA/
-│       └── 8B_TAC/                # concatenado antigo (corte em 4.096) — só referência
-├── Amostra_2/                     # 2ª época — dataset_ipc_v2, 25.563 linhas (numero_base)
-│   ├── Qwen_0.6B_a2/
-│   │   ├── 0.6B_C/
-│   │   └── 0.6B_TA/
-│   ├── Qwen_4B_a2/
-│   │   ├── 4B_C/
-│   │   └── 4B_TA/
-│   └── Qwen_8B_a2/
-│       ├── C/
-│       └── TA/
+├── Amostra_1/                          # 1ª época — PoC 1, pedidos de 2026, 20.697 linhas (numero_pedido)
+│   ├── BGE_M3_hybrid_a1/
+│   │   ├── C/                          # BGE_M3_hybrid_a1_C.tar.zst + config.json + resultado.json
+│   │   ├── TA/                         # BGE_M3_hybrid_a1_TA.tar.zst + config.json + resultado.json
+│   │   └── BGE_M3_hybrid_a1_manifest.json
+│   ├── EmbeddingGemma_2_a1/
+│   │   ├── Claims/                     # EmbeddingGemma_2_a1_Claims.tar.zst + config.json + resultado.json
+│   │   ├── TA/                         # EmbeddingGemma_2_a1_TA.tar.zst + config.json + resultado.json
+│   │   └── EmbeddingGemma_2_a1_manifest.json
+│   ├── Qwen_0.6B_a1/{06_C, 06_TA, 06_TAC}
+│   ├── Qwen_4B_a1/{4B_C, 4B_TA, TAC}
+│   ├── Qwen_8B_a1/
+│   │   ├── 8B_C/, 8B_TA/
+│   │   └── 8B_TAC/                     # embeddings_TAC.npy + pedidos.csv + metadata.json (arquivo único)
+│   └── metadados_TAC_amostra_1.csv     # metadados dos pedidos da amostra
+├── Amostra_2/                          # 2ª época — dataset_ipc_v2, 25.563 linhas (numero_base)
+│   ├── BGE_M3_hybrid_a2/
+│   │   ├── C/                          # BGE_M3_hybrid_a2_C_blocos_00000-00099.tar.zst e _00100-00199.tar.zst
+│   │   ├── TA/                         # BGE_M3_hybrid_a2_TA_blocos_00000-00099.tar.zst e _00100-00199.tar.zst
+│   │   └── BGE_M3_hybrid_a2_manifest.json
+│   ├── EmbeddingGemma_2_a2/
+│   │   ├── Claims/                     # v2_gemma2_claims.npy + ids.csv + config.json + resultado.json
+│   │   ├── TA/                         # v2_gemma2_ta.npy + ids.csv + config.json + resultado.json
+│   │   └── EmbeddingGemma_2_a2_manifest.json
+│   ├── Qwen_0.6B_a2/{0.6B_C, 0.6B_TA}
+│   ├── Qwen_4B_a2/{4B_C, 4B_TA}
+│   ├── Qwen_8B_a2/{C, TA}
+│   └── metadados_TAC_amostra_2.csv
 └── TF-IDF/
-    ├── modelos_svc/               # modelos LinearSVC + calibração (receita principal)
-    ├── receita_adam/              # receita logística/Adam dos embeddings aplicada ao TF-IDF
-    ├── resultados/
-    ├── scripts/
+    ├── modelos_svc/                    # 4 modelos LinearSVC (.joblib): grupo e subclasse, v1 e v1v2
+    ├── receita_adam/                   # 4 arquivos de pesos da receita logística/Adam aplicada ao TF-IDF
+    ├── resultados/                     # 5 arquivos .json
+    ├── scripts/                        # 3 scripts .py
     ├── vetores/
-    │   ├── vetorizador_v1/epoca1/
-    │   └── vetorizador_v1v2/{epoca1,epoca2}/
-    └── vetorizadores/             # vetorizador_v1.joblib e vetorizador_v1v2.joblib
+    │   ├── vetorizador_v1/epoca1/      # matriz.npz + metadata.json + pedidos.csv
+    │   └── vetorizador_v1v2/{epoca1, epoca2}/
+    ├── vetorizadores/                  # vetorizador_v1 e v1v2: .joblib + vocabulário .json + idf .npy
+    └── LEIAME.md
 ```
 
-Formato de cada pasta Qwen (saída do `embeddings_qwen3.ipynb`): `embeddings_00000.npy` (float, L2-normalizado),
-`pedidos_00000.csv` (identificador na mesma ordem), `bloco_00000.json`, `config.json` (modelo, versão, limite de
-tokens, SHA-256 do CSV de entrada) e `resultado.json`. Os vetores do **Gemma 2** não estão nessa pasta (ficaram no
-ambiente da API / Mac de desenvolvimento).
+**Formatos**
+- **Qwen3** (saída do `embeddings_qwen3.ipynb`), em blocos: `embeddings_00000.npy` (L2-normalizado),
+  `pedidos_00000.csv` (identificador, mesma ordem), `bloco_00000.json`, `config.json` (modelo, versão, limite de tokens,
+  SHA-256 do CSV de entrada) e `resultado.json`. As pastas `*TAC` (texto concatenado, corte antigo em 4.096 tokens)
+  são só referência: o TAC do classificador é a média dos vetores TA e C.
+- **BGE-M3** e **Gemma 2 da Amostra 1**: os blocos estão compactados em `.tar.zst` (o `manifest.json` traz o SHA-256,
+  o número de arquivos, de linhas e de blocos). Para extrair:
+  ```bash
+  tar --zstd -xf BGE_M3_hybrid_a1_TA.tar.zst        # ou: zstd -dc ARQUIVO.tar.zst | tar -x
+  ```
+  Os blocos do BGE-M3 trazem `embeddings_*.npy` (denso, 1.024 dim.), `sparse_*.npz` (pesos léxicos) e `ids_*.csv`.
+- **Gemma 2 da Amostra 2**: arquivo único por escopo (`v2_gemma2_ta.npy`, `v2_gemma2_claims.npy`, 768 dim.) com
+  `ids.csv` na mesma ordem do `dataset_ipc_v2.csv`.
+- No Gemma, o escopo das reivindicações se chama `Claims`; nos demais modelos, `C`.
 
 ## 13. Mapa do repositório
 
@@ -287,7 +317,7 @@ baseline.py                      leitura do CSV, rótulos, divisão da amostra 1
 embedding_experiment.py          preparação dos alvos (rótulos multirrótulo) usada pelos scripts do Gemma
 preparacao_dados/
   montar_dataset_ipc.py          montagem da amostra 2 (dataset_ipc_v2)
-  extrair_concordancia_cib.py    extrator das listas de concordância da OMPI (PDF → texto → JSON)
+  extrair_concordancia_ipc.py    extrator das listas de concordância da OMPI (PDF → texto → JSON)
 consulta_gemma/                  pipeline Gemma 2 (produção da API)
   encode_query_vectors.py        geração de vetores Gemma 2 (carregamento do modelo)
   encode_v2.py                   vetores Gemma 2 TA/C da amostra 2
@@ -304,7 +334,7 @@ consulta_gemma/                  pipeline Gemma 2 (produção da API)
     executar_notebook.py         executa o notebook de classificação fora do Jupyter, com outra configuração
     teste_pos_weight.py          experimento de peso por frequência
     poc1_rotulos.csv.gz, poc1_universo.json, vetores/v2_rotulos_e_ref.npz
-    modelos/                     pesos Qwen 4B e 8B (v1+v2)
+    modelos/                     pesos v1+v2 (média TA+C): Qwen 0.6B, 4B, 8B e BGE-M3
     resultados/                  métricas e acertos por pedido de cada experimento
 TF-IDF/                          linha de base TF-IDF (scripts, resultados, LEIAME.md)
 ```

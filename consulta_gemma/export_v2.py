@@ -3,7 +3,7 @@
 
 Mesma receita e mesmo formato de .npz de export_retrained.py; muda só o treino:
 treino do v1 (2026) + treino do v2 (XML 2014-17 e PDFs 2018+, rótulos atualizados pela concordância
-da CIB, só os do universo do v1; consultas do benchmark de busca excluídas). Limiar e top_n escolhidos na validação do v1; teste do v1 medido uma vez.
+da IPC, só os do universo do v1; consultas do benchmark de busca excluídas). Limiar e top_n escolhidos na validação do v1; teste do v1 medido uma vez.
 Os .npz atuais (1ª rodada, só v1) vão para ipc_models/anteriores_v1/ antes de gravar os novos.
 
     python3 consulta_gemma/export_v2.py --scopes tr_r      (um escopo por vez, ~1 min cada)

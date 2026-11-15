@@ -4,7 +4,7 @@
 Receita fixa (igual a export_retrained.py): logística OvR, Adam, 30 épocas, λ=0, vetores TAC
 (média de TA e Claims, Gemma 2, normalizados). Universo de rótulos fixo = o do v1 (2026):
 575 subclasses e 2.585 grupos principais. Grupos antigos do v2 são atualizados pelas listas de
-concordância da CIB quando a correspondência é 1:1 (ambíguos descartados); o que ficar fora do universo é descartado.
+concordância da IPC quando a correspondência é 1:1 (ambíguos descartados); o que ficar fora do universo é descartado.
 Decodificação hierárquica: nota do grupo = log σ(grupo) + log σ(subclasse-mãe).
 
 Variantes de treino:
@@ -80,7 +80,7 @@ _CONC = None
 
 
 def atualizar_grupo(g, sub):
-    """Leva um grupo principal antigo à CIB 2026.01 pelas listas de concordância (2018.01 a 2026.01, sem 2022.01).
+    """Leva um grupo principal antigo à IPC 2026.01 pelas listas de concordância (2018.01 a 2026.01, sem 2022.01).
 
     Correspondência 1:1 -> grupo novo. 1:N -> grupo descartado (ambíguo); a subclasse fica se todos os
     destinos forem da mesma subclasse. Grupos sem entrada nas listas ficam como estão."""

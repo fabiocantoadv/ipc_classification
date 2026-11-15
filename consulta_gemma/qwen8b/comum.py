@@ -52,7 +52,7 @@ def media_normalizada(*matrizes: np.ndarray) -> np.ndarray:
 
 
 def rotulos_amostra2(pacote: Path = AQUI) -> dict:
-    """Rótulos da amostra 2 já no universo da amostra 1 (com concordância da CIB), máscaras de treino e referência
+    """Rótulos da amostra 2 já no universo da amostra 1 (com concordância da IPC), máscaras de treino e referência
     do Gemma v1 + v2 de produção (acertos por pedido no teste). Gerado por consulta_gemma/train_v2.py (load_v2)."""
     r = np.load(Path(pacote) / "vetores/v2_rotulos_e_ref.npz", allow_pickle=True)
     return {

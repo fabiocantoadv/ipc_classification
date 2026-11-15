@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Extrai das listas de concordância da CIB/IPC da OMPI (PDF "antigo → novo" de cada revisão) o mapa
+"""Extrai das listas de concordância da IPC da OMPI (PDF "antigo → novo" de cada revisão) o mapa
 grupo principal antigo → grupos principais novos, usado para atualizar os rótulos da amostra 2 (2014-2019) para a
-CIB 2026.01 (consulta_gemma/train_v2.py, função atualizar_grupo).
+IPC 2026.01 (consulta_gemma/train_v2.py, função atualizar_grupo).
 
 Entrada: uma pasta com os PDFs convertidos em texto (pdftotext -layout arquivo.pdf arquivo.txt), um por revisão.
 Saída: <pasta>/concordancia.json  {versão: {grupo_antigo: [grupos_novos]}}  (cópia em consulta_gemma/v2/
@@ -9,7 +9,7 @@ concordancia_ipc_grupos.json). Revisões usadas: 2018.01, 2019.01, 2020.01, 2021
 (faltaram 2015.01, 2016.01, 2017.01 e 2022.01). Intervalos "X - Y" entram pelas duas pontas (aproximação: grupos
 intermediários de um intervalo que atravessa grupos principais não são listados).
 
-Uso:  python preparacao_dados/extrair_concordancia_cib.py PASTA_COM_TXT
+Uso:  python preparacao_dados/extrair_concordancia_ipc.py PASTA_COM_TXT
 """
 import re, json, glob, collections, sys
 CODE = re.compile(r'([A-H]\d\d[A-Z])\s+(\d+)/(\d+)(?:\s*-\s*(?:([A-H]\d\d[A-Z])\s+)?(\d+)/(\d+))?')
