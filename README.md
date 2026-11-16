@@ -1,8 +1,10 @@
 # Classificador IPC de pedidos de patente (PatenteIA — IBICT / INPI)
 
 Classificador que sugere, para um pedido de patente brasileiro, os **grupos principais** e as **subclasses** da
-Classificação Internacional de Patentes (IPC) mais prováveis, a partir de **embeddings** do título, do resumo e das
-reivindicações. Este repositório reúne os dados de rótulos, os scripts, os notebooks e os resultados da comparação entre
+Classificação Internacional de Patentes (IPC) mais prováveis, a partir de **embeddings** criados a partir dos campos textuais título (title) e resumo (abstract) (TA) e 
+reivindicações (claims) (C). Esses dois conjuntos de embeddings podem ainda ser usados conjuntamente (TAC), a partir do cálculo do score médio de ambos. 
+
+Este repositório reúne os dados de rótulos, os scripts, os notebooks e os resultados da comparação entre
 **Gemma 2 (EmbeddingGemma)**, **Qwen3-Embedding 0.6B / 4B / 8B**, **BGE-M3** e uma linha de base **TF-IDF**, todos com o mesmo
 **classificador hierárquico**.
 
